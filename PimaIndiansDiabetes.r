@@ -146,14 +146,6 @@ p2<- ggplot(data_plot, aes(as.factor(diabetes), Full))+geom_boxplot()
 grid.arrange(p1, p2)
 
 
-
-log_predict <- predict(logit1,newdata = reduce_testing,type = "response")
-plot(roc(reduce_testing$diabetes, log_predict, direction="<"),
-     col="yellow", lwd=3, main="The turtle finds its way")
-log_predict <- ifelse(log_predict > 0.5,1,0)
-sprintf("AUC: %f",auc(reduce_testing$diabetes,log_predict))
-
-
 log_predict2 <- predict(logit2,newdata = test,type = "response")
 plot(roc(test$diabetes, log_predict2, direction="<"),
      col="yellow", lwd=3, main="The turtle finds its way")
