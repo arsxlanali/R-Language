@@ -1,0 +1,138 @@
+---
+title: "Data Exploration"
+author: "Matt Horrigan"
+date: "2022-12-14"
+    bookdown::word_document2:
+    fig_caption: true
+---
+
+```{r setup, include= FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	fig.align = "center",
+	message = FALSE,
+	warning = FALSE,
+	out.height = "500px",
+	out.width = "100%"
+)
+```
+
+```{r}
+library(stringr)
+library(dplyr)
+```
+
+```{r}
+data <- read.csv("data.csv")
+```
+
+## Problem Statement
+
+The task was to build the **Exploratory Data Analysis** (EDA) for a fraud in Taxi service. We need to visualize our data for better understanding. We need to have indepth analysis for better understaning the trends in the data. This analysis can help the company to avoid the fraud being happening.
+
+In our dataset we have variables like driver name, age, address, first passenger name, second passenger name, repair cost and fraud flag.
+
+```{r}
+summary((data))
+```
+
+## 
+
+Solution Statement
+
+We will be using the following data science technique for solving this problem. Such as:
+
+-   Data preprocessing to make it more user friendly.
+
+-   Feature Engineering for visualizations.
+
+-   visualizing data for in depth analysis.
+
+-   Giving the insights gain from the data through conclusion.
+
+## 
+
+Exploratory Analysis
+
+We did the exploratory analysis using some important features like driver name, age, address and cost. First I applied data preprocesing on the repair cost variable for better visualization (converted the string values to Interger values) and deleted the unrelated data.
+
+```{r, echo=FALSE}
+data[c('str', 'cost')] <- str_split_fixed(data$repaircost, ' ', 2)
+data <- data[c('driver','age','address','passenger1','passenger2','cost','fraudFlag')]
+data1 <- replace(data$cost,str_detect(data$cost, "3k"),3000)
+data1 <- replace(data1,str_detect(data1, "2k"),2000)
+data1 <- replace(data1,str_detect(data1, "1k"),1000)
+data$cost <- data1
+data$cost[data$cost=='$*0'] <- NA
+data$cost <- as.integer(data$cost)
+data <- na.omit(data)
+```
+
+```{r age-fraud,echo=FALSE,fig.cap="Wishker Plot for Age vs Fraud"}
+boxplot(age~fraudFlag,data=data, main="Fraud in Taxi Service",
+        xlab="Fraud Happened?", ylab="Age of Driver")
+```
+
+In Figure \@ref(fig:age-fraud) we can see most the fraud was done by the people below the age of 40 year. This shows that the young driver tend to do fraud more offten than older people.
+
+```{r percentage,echo=FALSE, fig.cap="Percentage of Honest vs Dishonest Drivers"}
+data$fraudFlag <-as.integer(data$fraudFlag)
+df_grp <- data %>% group_by(driver) %>% 
+  summarise(fraud=sum(fraudFlag))
+
+
+n_driver <- nrow(df_grp)
+df_grp$fraud[df_grp$fraud==0] <- NA
+df_grp <- na.omit(df_grp)
+nf_driver <- nrow(df_grp)
+n_driver <- n_driver - nf_driver
+pie(c(nf_driver,n_driver), c("0.11%","0.89%"), main="Percentage of Honest & Dishonest Drivers",col = rainbow(2))
+legend("topright", c("Dishonest","Honest"), cex = 0.8,
+       fill = rainbow(2))
+```
+
+In Figure \@ref(fig:percentage) we can see that 11% of the driver (mostly young driver) did fraud out of the total of 568 drivers.
+
+```{r nmFruad,echo=FALSE, fig.cap="Number of times Driver did fruad vs Names of driver"}
+df_grp <- df_grp[order(df_grp$fraud,decreasing = TRUE),]
+# Plot the bar chart 
+par(mai=c(1,2,1,1))
+barplot(df_grp$fraud,names.arg=df_grp$driver,xlab="Number of times Fraud done by driver",
+        main="Driver Fruad Chart",horiz = TRUE,las=1, col = 'black')
+```
+
+We want to know which driver is being dishonest in their ride. In order to do this analysis we plotted the bar chart for number of times the one specific driver did fraud in their ride. In Figure \@ref(fig:nmFruad) we can see that the driver name Liam Cahill did fraud four times to their passengers.
+
+```{r cost, echo=FALSE}
+df_grp <- data %>% group_by(cost) %>% 
+  summarise(fraud=sum(fraudFlag))
+barplot(df_grp$fraud,names.arg=df_grp$cost, main="Fraud in Taxi Service",
+        xlab="Amount", ylab="Number of Times Fraud Happned")
+```
+
+For the purpose to know the fraud happened to the specific passenger we plotted the bar chart with the most fraud happened we can see the Figure Figure \@ref(fig:passenger)
+
+```{r passenger, echo=FALSE}
+df_grp <- data %>% group_by(passenger1) %>% 
+  summarise(fraud=sum(fraudFlag))
+df_grp$fraud[df_grp$fraud==0] <- NA
+df_grp <- na.omit(df_grp)
+df_grp <- df_grp[order(df_grp$fraud,decreasing = TRUE),]
+par(mai=c(1,2,1,1))
+barplot(df_grp$fraud,names.arg=df_grp$passenger1,xlab="Number of times Fraud done by driver",
+        main="Driver Fruad Chart",horiz = TRUE,las=1, col = 'black')
+```
+
+## 
+
+Conclusion
+
+In conclusion we can say that the fraud is totally personal choice but I can happen to the same person for more than one time.
+
+-   The younger driver did fraud more often.
+
+-   Most fraud happened in the low cost such as 500.
+
+-   The person who do fraud will likely to do the fraud again based on the passenger.
+
+-   Most of the driver were honest in their ride.
