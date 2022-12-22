@@ -1,14 +1,4 @@
-#install.packages('mlbench')
-#install.packages('dplyr')
-#install.packages('DescTools')
-#install.packages("randomForest")
-#install.packages('Hmisc')
-#install.packages('ggplot2')
-#install.packages('gridExtra')
-#install.packages('ROCR')
-#install.packages('caret')
-#install.packages('pROC')
-#install.packages('Metrics')
+
 library(pROC)
 library(ROCR);
 library(Hmisc); 
