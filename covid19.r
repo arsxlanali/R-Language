@@ -21,8 +21,35 @@ data <-na.omit(data)
 summary(data)
 par(mfrow = c(2, 2))  # Set up a 2 x 2 plotting space
 
-order <- data[order(-data$TotalDeaths):10,]
+mean(data$TotalDeaths[data$OldAge])
+mean(data$TotalDeaths[data$MiddleAge])
+mean(data$TotalDeaths[data$YoungAge])
 
+sd(data$TotalDeaths[data$OldAge])
+sd(data$TotalDeaths[data$MiddleAge])
+sd(data$TotalDeaths[data$YoungAge])
+
+mean(na.omit(data$TotalDeaths[data$White]))
+mean(data$TotalDeaths[data$Asian])
+
+sd(na.omit(data$TotalDeaths[data$White]))
+sd(data$TotalDeaths[data$Asian])
+
+
+
+order <- data[order(-data$TotalDeaths),]
+order <- order[1:10,]
+x <- ggplot(order, aes(x =reorder(BoroughName, -TotalDeaths), y = TotalDeaths))
+x <- x + geom_bar(stat="identity", color='red',fill='red')
+x <- x + theme(axis.text.x=element_text(angle=45, hjust=0.9))
+x
+
+order <- data[order(-data$OldAge),]
+order <- order[1:10,]
+x <- ggplot(order, aes(x =reorder(BoroughName,-OldAge),  y = OldAge))
+x <- x + geom_bar(stat="identity", color='red',fill='red')
+x <- x + theme(axis.text.x=element_text(angle=45, hjust=0.9))
+x
 
 vector <- c('Level3','Level4')
 for (col in vector) { 
